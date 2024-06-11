@@ -9,7 +9,7 @@
 
 ## Running the program
 1. Put the Excel file in the same folder as the script
-2. Open *main.py* and navigate to line 42
+2. Open *main.py* and navigate to line 42 
 3. Type in the parameters based on the instructions
 
 
