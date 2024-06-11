@@ -8,8 +8,8 @@
 4. Open *package_installer.py* and click the play button
 
 ## Running the program
-1. Open *main.py* and navigate to line 42
-2. Put the Excel file in the same folder as the script
+1. Put the Excel file in the same folder as the script
+2. Open *main.py* and navigate to line 42
 3. Type in the parameters based on the instructions
 
 
