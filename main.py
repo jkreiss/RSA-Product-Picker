@@ -35,7 +35,7 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
     if len(df) < num_items:
         return "Insufficient stock available"
 
-    for _ in range(100000):
+    for _ in range(250):
         selected_items, names = [0], []
         while len(selected_items) - 1 < num_items:
             item = df.sample().to_dict(orient='index')
