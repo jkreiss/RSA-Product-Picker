@@ -1,5 +1,9 @@
 # RSA Product Picker
 
+This will occasionally go into an infinite loop if there are more items needed than unique items in the price range. 
+If its taking forever... its not working. Just press the stop in the top right corner. 
+If I think if a solution to this, I'll add it.
+
 ## Setup
 
 1. Download [Pycharm](https://www.jetbrains.com/pycharm/download/?section=mac) and [Python](https://www.python.org/downloads/?fbclid=IwAR35p70YwPCDXSMJ-ftJ_FcKX7-6HN_UKy5oTsjOlX2QvUX0LGtszD4_2RU)
