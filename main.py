@@ -1,8 +1,9 @@
+import random
 import pandas as pd
 import numpy as np
 
 
-def generate_random_list(filename, desired_avg_cost, num_jerseys, include_tags=None, exclude_tags=None,
+def generate_random_list(filename, desired_avg_cost, num_items, include_tags=None, exclude_tags=None,
                          include_product=None, exclude_product=None):
     df = pd.read_excel(filename)
     column_names = df.columns.tolist()
@@ -23,37 +24,43 @@ def generate_random_list(filename, desired_avg_cost, num_jerseys, include_tags=N
         df = df[df[column_names[1]].apply(lambda x: isinstance(x, str) and
                                                     all(prod.lower() not in x.lower() for prod in exclude_product))]
 
-    min_cost = desired_avg_cost - (desired_avg_cost * .05)
-    max_cost = desired_avg_cost + (desired_avg_cost * .05)
+    min_cost = desired_avg_cost * .5
+    max_cost = desired_avg_cost * 1.5
 
     df = df[df['Variant Price'] >= min_cost]
     df = df[df['Variant Price'] <= max_cost]
 
-    selected_items, selected_costs, names = [], [], []
+    selected_lists = []
 
-    while len(selected_items) < num_jerseys and not df.empty:
-        item = df.sample().to_dict(orient='index')
-        for key, vals in item.items():
-            name = ' '.join(vals[column_names[0]].split()[:2])
-            if name not in names:
-                names.append(name)
-                selected_items.append(vals['Variant SKU'])
-                selected_costs.append(vals['Variant Price'])
+    if len(df) < num_items:
+        return "Insufficient stock available"
 
-        df = df.drop(list(item.keys())[0])
+    for _ in range(100000):
+        selected_items, names = [0], []
+        while len(selected_items) - 1 < num_items:
+            item = df.sample().to_dict(orient='index')
+            for key, vals in item.items():
+                name = ' '.join(vals[column_names[0]].split()[:2])
+                if name not in names:
+                    names.append(name)
+                    selected_items[0] += vals['Variant Price']
+                    selected_items.append((vals['Variant SKU'], vals['Variant Price']))
 
-    return selected_items, sum(selected_costs), np.mean(selected_costs), selected_costs
+        avg_cost = selected_items[0] / num_items
+        if desired_avg_cost * 0.95 <= avg_cost <= desired_avg_cost * 1.05:
+            selected_lists.append((selected_items, avg_cost))
+
+    return random.choice(selected_lists)
 
 
 # USE THE PROGRAM
+# Desired average cost
+desired_avg_cost = 70
 
-# Desired average cost per jersey
-desired_avg_cost = 99
+# Number of items wanted
+num_items = 5
 
-# Number of jerseys wanted
-num_jerseys = 30
-
-# EXACT file name
+# EXACT file name and in quotes. it should pop up green
 # The file MUST be in the same folder as the script
 file = 'Inv export.xlsx'
 
@@ -64,11 +71,10 @@ exclude_tags = []
 include_product = None
 exclude_product = ''
 
-items, cost, avg_cost, costs = generate_random_list(file, desired_avg_cost, num_jerseys,
+items, cost = generate_random_list(file, desired_avg_cost, num_items,
                                                     include_tags=include_tags, exclude_tags=exclude_tags,
                                                     include_product=include_product, exclude_product=exclude_product)
-print('total items:', len(items))
-print("selected_items=", items)
-print("total cost:", cost)
-print("average cost:", avg_cost)
-print("costs:", costs)
+print('avg cost:', cost)
+print('total cost:', items[0])
+print("selected_items =", items[1:])
+
