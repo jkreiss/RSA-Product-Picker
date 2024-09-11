@@ -33,12 +33,15 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
     selected_lists = []
 
     if len(df) < num_items:
-        return "Insufficient stock available"
+        return "Insufficient stock available", None
+
 
     for _ in range(250):
         selected_items, names = [0], []
-        while len(selected_items) - 1 < num_items:
+        i = 0
+        while len(selected_items) - 1 < num_items and i < len(df):
             item = df.sample().to_dict(orient='index')
+            i += 1
             for key, vals in item.items():
                 name = ' '.join(vals[column_names[0]].split()[:2])
                 if name not in names:
@@ -58,7 +61,7 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
 desired_avg_cost = 70
 
 # Number of items wanted
-num_items = 5
+num_items = 20
 
 # EXACT file name and in quotes. it should pop up green
 # The file MUST be in the same folder as the script
@@ -77,4 +80,5 @@ items, cost = generate_random_list(file, desired_avg_cost, num_items,
 print('avg cost:', cost)
 print('total cost:', items[0])
 print("selected_items =", items[1:])
+
 
