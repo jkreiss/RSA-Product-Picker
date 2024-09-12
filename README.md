@@ -16,7 +16,7 @@ will fail to clone. To fix this just add the name you want the folder to be afte
 
 ## Running the program
 1. Put the Excel file in the same folder that was just cloned
-2. Open *main.py* and navigate to line 55 
+2. Open *main.py*, go to the bottom, where it says USE THE PROGRAM
 3. Type in the parameters based on the instructions
 4. Click the play button
 
