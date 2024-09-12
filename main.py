@@ -47,7 +47,7 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
                 if name not in names:
                     names.append(name)
                     selected_items[0] += vals['Variant Price']
-                    selected_items.append((vals['Variant SKU'], vals['Variant Price']))
+                    selected_items.append((vals['Variant SKU']))
 
         avg_cost = selected_items[0] / num_items
         if desired_avg_cost * 0.95 <= avg_cost <= desired_avg_cost * 1.05:
