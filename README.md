@@ -20,8 +20,8 @@ will fail to clone. To fix this just add the name you want the folder to be afte
 3. Type in the parameters based on the instructions
 4. Click the play button
 
-If you're having issues the excel sheet is probably formatted wrong it should be in the form \
-Title | Type | Tags | SKU | Inventory | Price | ...
+If you're having issues make sure its an excel file and you can see the file on the left hand side under project.
+Also make sure it has *tags* and *type* somewhere in the headers 
 
 ## Pulling updates
 1. Click *Git* on the toolbar at the top
