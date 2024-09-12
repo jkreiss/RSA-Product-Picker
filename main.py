@@ -6,22 +6,24 @@ import numpy as np
 def generate_random_list(filename, desired_avg_cost, num_items, include_tags=None, exclude_tags=None,
                          include_product=None, exclude_product=None):
     df = pd.read_excel(filename)
-    column_names = df.columns.tolist()
+    # pretty sure i can just add a check for the file to see if its csv or xslx and use pd.read_csv(filename)
+    # then it has functionality for both look into it if ever web app
+    column_names = [header.title() for header in df.columns.tolist()]
 
     if include_tags:
-        df = df[df[column_names[2]].apply(lambda x: isinstance(x, str) and
+        df = df[df[column_names[column_names.index("Tags")]].apply(lambda x: isinstance(x, str) and
                                                     all(tag.lower() in x.lower() for tag in include_tags))]
     if exclude_tags:
         exclude_tags.lower()
-        df = df[df[column_names[2]].apply(lambda x: isinstance(x, str) and
+        df = df[df[column_names[column_names.index("Tags")]].apply(lambda x: isinstance(x, str) and
                                                     all(tag.lower() not in x.lower() for tag in exclude_tags))]
     if include_product:
         include_product.lower()
-        df = df[df[column_names[1]].apply(lambda x: isinstance(x, str) and
+        df = df[df[column_names[column_names.index("Type")]].apply(lambda x: isinstance(x, str) and
                                                     all(prod.lower() in x.lower() for prod in include_product))]
     if exclude_product:
         exclude_product.lower()
-        df = df[df[column_names[1]].apply(lambda x: isinstance(x, str) and
+        df = df[df[column_names[column_names.index("Type")]].apply(lambda x: isinstance(x, str) and
                                                     all(prod.lower() not in x.lower() for prod in exclude_product))]
 
     min_cost = desired_avg_cost * .5
@@ -31,9 +33,6 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
     df = df[df['Variant Price'] <= max_cost]
 
     selected_lists = []
-
-    if len(df) < num_items:
-        return "Insufficient stock available", None
 
 
     for _ in range(250):
@@ -56,7 +55,7 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
     return random.choice(selected_lists)
 
 
-# USE THE PROGRAM
+'''USE THE PROGRAM'''
 # Desired average cost
 desired_avg_cost = 70
 
@@ -74,11 +73,14 @@ exclude_tags = []
 include_product = None
 exclude_product = ''
 
+
 items, cost = generate_random_list(file, desired_avg_cost, num_items,
                                                     include_tags=include_tags, exclude_tags=exclude_tags,
                                                     include_product=include_product, exclude_product=exclude_product)
+
 print('avg cost:', cost)
 print('total cost:', items[0])
 print("selected_items =", items[1:])
+
 
 
