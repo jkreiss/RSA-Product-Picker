@@ -31,15 +31,17 @@ Also make sure it has *tags* and *type* somewhere in the headers
 5. Then pull
 
 
-This will update anywhere in the code where local changes have not been made.
-If it's not working, in the bottom right of the pycharm window theres a box with >_ in it called terminal, run these 
-commands in this order:
+This will update anywhere in the code where local changes have not been made. 
+
+If it's not working, either revert local changes by going *File>Local History>Show History* and reverting them from
+there or open the terminal (in the bottom left of the pycharm window theres a box with >_ in it called terminal) 
+and run these commands in this order:
 
 `git fetch origin` \
 `git reset --hard origin/main` \
 `git pull origin main` 
 
-But it's probably easier to just delete the folder and reclone it
+**But it's probably easier to just delete the folder and reclone it**
 
 
 
