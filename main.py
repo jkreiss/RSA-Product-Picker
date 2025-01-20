@@ -14,15 +14,12 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
         df = df[df[column_names[column_names.index("Tags")]].apply(lambda x: isinstance(x, str) and
                                                     all(tag.lower() in x.lower() for tag in include_tags))]
     if exclude_tags:
-        exclude_tags.lower()
         df = df[df[column_names[column_names.index("Tags")]].apply(lambda x: isinstance(x, str) and
                                                     all(tag.lower() not in x.lower() for tag in exclude_tags))]
     if include_product:
-        include_product.lower()
         df = df[df[column_names[column_names.index("Type")]].apply(lambda x: isinstance(x, str) and
                                                     all(prod.lower() in x.lower() for prod in include_product))]
     if exclude_product:
-        exclude_product.lower()
         df = df[df[column_names[column_names.index("Type")]].apply(lambda x: isinstance(x, str) and
                                                     all(prod.lower() not in x.lower() for prod in exclude_product))]
 
