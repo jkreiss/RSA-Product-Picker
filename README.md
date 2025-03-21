@@ -41,7 +41,7 @@ and run these commands in this order:
 `git reset --hard origin/main` \
 `git pull origin main` 
 
-**But it's probably easier to just delete the folder and reclone it**
+**But it's probably easier to just delete the folder and restart from setup step 2**
 
 
 

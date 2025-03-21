@@ -35,8 +35,11 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
 
     df = df[df['Variant Price'] >= min_cost]
     df = df[df['Variant Price'] <= max_cost]
-    df_low = df[df['Variant Price'] < desired_avg_cost]
+    df_low = df[df['Variant Price'] <= desired_avg_cost]
     df_high = df[df['Variant Price'] > desired_avg_cost]
+    # df_unique = df[df[]]
+    print('{} total items matching tags, {} items costing more than ${} and {} items costing less than ${}'.format(df.shape[0], df_high.shape[0], desired_avg_cost, df_low.shape[0], desired_avg_cost))
+    print('Average cost of items with matching tags {:.2f}\n___________________'.format(sum(df['Variant Price'])/ df.shape[0]))
 
     selected_lists = []
 
@@ -45,9 +48,11 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
         i = 0
         j = 0
         while len(selected_items) - 1 < num_items and i < len(df):
-            if i > num_items * .65 and selected_items[0] / (len(selected_items) - 1) > desired_avg_cost:
+            skew_number = df.shape[0] - max(df_low.shape[0], df_high.shape[0]) if df.shape[0] < num_items else num_items
+            # skew number is used to offset the df if the balance of the df is very off
+            if i > skew_number * .65 and selected_items[0] / (len(selected_items) - 1) > desired_avg_cost:
                 item = df_low.sample().to_dict(orient='index')
-            elif i > num_items * .65 and selected_items[0] / (len(selected_items) - 1) < desired_avg_cost:
+            elif i > skew_number * .65 and selected_items[0] / (len(selected_items) - 1) < desired_avg_cost:
                 item = df_high.sample().to_dict(orient='index')
             else:
                 item = df.sample().to_dict(orient='index')
@@ -56,8 +61,8 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
             for key, vals in item.items():
                 name = ' '.join(vals[column_names[0]].split()[:2])
                 if name not in names:
-                    if j % 10 == 0 or desired_avg_cost * 0.75 <= vals['Variant Price'] <= desired_avg_cost * 1.25:
-                        # 1/10 items have 50% variation all others have 25%
+                    if j % 10 == 0 or desired_avg_cost * 0.75 <= vals['Variant Price'] <= desired_avg_cost * 1.25 or len(selected_items) < num_items / 10:
+                        # First 10 items all go if names are unique after that, 1/10 items have 50% variation all others have 25%
                         names.append(name)
                         selected_items[0] += vals['Variant Price']
                         selected_items.append((vals['Variant SKU']))
@@ -66,17 +71,17 @@ def generate_random_list(filename, desired_avg_cost, num_items, include_tags=Non
         if desired_avg_cost * 0.95 <= avg_cost <= desired_avg_cost * 1.05:
             selected_lists.append((selected_items, avg_cost, (len(selected_items) - 1)))
     try:
-        print(len(selected_lists))
         return random.choice(selected_lists)
     except IndexError:
-        print(f"\nCould not find a match with the given parameters. Try again and if it still doesnt work it probably "
-              f"doesn't have items matching the description")
+        print(f"\nCould not find a match with the given tags. Try again.\n"
+              f"If the average cost of the items is far greater than the desired "
+              f"average cost it is unlikely to find a match within the given tags ")
         sys.exit(1)
 
 
 '''USE THE PROGRAM'''
 # Desired average cost
-desired_avg_cost = 60
+desired_avg_cost = 75
 
 # Number of items wanted
 num_items = 100
@@ -87,7 +92,7 @@ file = '1.20 RSA export.xlsx'
 
 # The following should be in the form ['tag1', 'tag2', 'tag3']
 # If you want to make on of them do nothing make it equal None, '', or []
-include_tags = ['fb', 'jerseys']
+include_tags = ['fb', 'jerseys', 'current']
 exclude_tags = ['clearance']
 include_product = None
 exclude_product = ''
