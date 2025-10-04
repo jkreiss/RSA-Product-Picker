@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+  <title>Mystery Box Picker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+</head>
+<body class="container py-4">
+  <h1>Mystery Box Picker</h1>
+
+  <!-- Upload form -->
+  <form id="upload-form">
+    <input type="file" id="file-input" class="form-control mb-3" accept=".xlsx,.xls" required>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+
+  <!-- Filter selection -->
+<div id="additional-params" class="mt-4" style="display:none;">
+  <div class="row">
+    <div class="row mt-3">
+      <div class="col-md-6">
+        <label for="desired-avg-cost" class="form-label">Desired Average Cost</label>
+        <input type="number" id="desired-avg-cost" class="form-control" placeholder="e.g. 75">
+      </div>
+      <div class="col-md-6">
+        <label for="num-items" class="form-label">Number of Items</label>
+        <input type="number" id="num-items" class="form-control" placeholder="e.g.100">
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-md-6">
+        <label for="min-cost" class="form-label">Minimum Cost</label>
+        <input type="number" id="min-cost" class="form-control" placeholder="Optional">
+      </div>
+      <div class="col-md-6">
+        <label for="max-cost" class="form-label">Maximum Cost</label>
+        <input type="number" id="max-cost" class="form-control" placeholder="Optional">
+      </div>
+    </div>
+    <div id="filters-section" style="display:none;" class="mt-5">
+    <h2>Select Filters</h2>
+    <div id="filter-container"></div>
+    <button id="run-filters-btn" class="btn btn-success mt-2">Apply Filters</button>
+  </div>
+  </div>
+</div>
+
+  <!-- Results -->
+  <div id="results" class="mt-5"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    const uploadForm = document.getElementById("upload-form");
+    const filterContainer = document.getElementById("filter-container");
+    const filtersSection = document.getElementById("filters-section");
+    const resultsDiv = document.getElementById("results");
+    let uniqueValuesData = {};
+
+    uploadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("file-input");
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]); // RAW file, do NOT JSON.stringify
+
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData,  // just the FormData
+        // Do NOT set Content-Type manually!
+      });
+      const data = await response.json();
+      uniqueValuesData = data.unique_values;
+
+      filterContainer.innerHTML = "";
+      for (const [col, values] of Object.entries(uniqueValuesData)) {
+        const label = document.createElement("label");
+        label.innerText = col;
+        const select = document.createElement("select");
+        select.id = `select-${col}`;
+        select.setAttribute("multiple", "multiple");
+        select.classList.add("form-control");
+
+        values.forEach(v => {
+          const option = document.createElement("option");
+          option.value = v;
+          option.text = v;
+          select.appendChild(option);
+        });
+
+        filterContainer.appendChild(label);
+        filterContainer.appendChild(select);
+        new Choices(select, { removeItemButton: true, searchEnabled: true });
+      }
+
+      filtersSection.style.display = "block";
+      document.getElementById("additional-params").style.display = "block"; // shows cost inputs
+      resultsDiv.innerHTML = "";
+    });
+
+    document.getElementById("run-filters-btn").addEventListener("click", async () => {
+  const filters = {};
+  for (const col of Object.keys(uniqueValuesData)) {
+    const select = document.getElementById(`select-${col}`);
+    filters[col] = Array.from(select.selectedOptions).map(opt => opt.value);
+    if (filters[col].length === 0) {
+      filters[col] = null;
+    }
+
+  }
+
+  // Get the new input values
+ function parseNumber(value) {
+  const num = parseFloat(value);
+  return isNaN(num) ? null : num;
+  }
+  // doesnt work when min and max arent filled
+
+  const desiredAvgCost = parseNumber(document.getElementById("desired-avg-cost").value);
+  const numItems = parseNumber(document.getElementById("num-items").value);
+  const minCost = parseNumber(document.getElementById("min-cost").value);
+  const maxCost = parseNumber(document.getElementById("max-cost").value);
+
+  const formData = new FormData();
+  formData.append("filters", JSON.stringify(filters));
+  formData.append("desired_avg_cost", desiredAvgCost);
+  formData.append("num_items", numItems);
+  if (minCost !== null) formData.append("minimum_cost", minCost);
+  if (maxCost !== null) formData.append("maximum_cost", maxCost);
+
+  const response = await fetch("/analyze", { method: "POST", body: formData });
+  const data = await response.json();
+    let html = "<h2>Items</h2><table class='table table-bordered table-striped'>";
+    // html += "<thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>";
+
+    for (const [key, value] of Object.entries(data.results)) {
+      let displayValue;
+
+      if (value === null || value === undefined) {
+        // Handle missing values
+        displayValue = "<em>None</em>";
+      } else {
+        // Simple values
+        displayValue = value;
+      }
+
+      html += `<tr><td><strong>${key}</strong></td><td>${displayValue}</td></tr>`;
+    }
+
+    html += "</tbody></table>";
+    resultsDiv.innerHTML = html;});
+  </script>
+</body>
+</html>
