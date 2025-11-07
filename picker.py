@@ -1,6 +1,4 @@
 import random
-import sys
-
 import pandas as pd
 
 def generate_random_list(df, desired_avg_cost, num_items,
@@ -51,6 +49,7 @@ def generate_random_list(df, desired_avg_cost, num_items,
         broke = False
         while len(selected_items) - 1 < num_items and i < len(df):
             skew_number = df.shape[0] - max(df_low.shape[0], df_high.shape[0]) if df.shape[0] < num_items else num_items
+            # maybe add if df.shape - max(low.shape, high.shape) < num_items bc rn it seems useless ish?
             # skew number is used to offset the df if the balance of the df is very off
             if i > skew_number * .65 and len(selected_items) == 1:
                 broke = True
@@ -67,8 +66,9 @@ def generate_random_list(df, desired_avg_cost, num_items,
             for key, vals in item.items():
                 name = ' '.join(vals[column_names[0]].split()[:2])
                 if name not in names:
-                    if j % 10 == 0 or desired_avg_cost * 0.75 <= vals['Variant Price'] <= desired_avg_cost * 1.25 or len(selected_items) < num_items / 10:
-                        # First 10 items with 50% variation, 1/10 items have 50% variation all others have 25%
+                    if j % 5 == 0 or desired_avg_cost * 0.75 <= vals['Variant Price'] <= desired_avg_cost * 1.25 or len(selected_items) < num_items / 2:
+                        # could add a call to df with only 25% variation here for fastness
+                        # First 50% of items with 50% variation, 1/5 items have 50% variation all others have 25%
                         names.append(name)
                         selected_items[0] += vals['Variant Price']
                         selected_items.append((vals['Variant SKU']))

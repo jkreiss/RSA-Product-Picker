@@ -21,7 +21,7 @@ def update_pip():
     print('Upgrading pip to latest version... \n')
     subprocess.run(
     [PATH] +
-    '-m pip install --user --upgrade pip'.split(),
+    '-m pip install --upgrade pip'.split(),
      check=True)
 
 
@@ -36,7 +36,7 @@ def install_module_for_user(module):
     '--no-cache-dir',
      '--no-warn-script-location']
     print(f'Installing {module} for the current user... \n')
-    subprocess.run([PATH] + f'-m pip install --user {module}'.split() +options, check=True)
+    subprocess.run([PATH] + f'-m pip install {module}'.split() +options, check=True)
 
 
 def check_for_conflicting_files():
